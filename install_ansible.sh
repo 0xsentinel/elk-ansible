@@ -7,8 +7,7 @@ fi
 
 yum_makecache_retry() {
   tries=0
-  until [ $tries -ge 5 ]
-  do
+  until [ $tries -ge 5 ]; do
     yum makecache && break
     let tries++
     sleep 1
@@ -82,7 +81,7 @@ if [ ! "$(which ansible-playbook)" ]; then
 
     # Install required Python libs and pip
     apt_install python-pip python-yaml python-jinja2 python-httplib2 python-netaddr python-paramiko python-pkg-resources libffi-dev
-    [ -n "$( dpkg_check_lock && apt-cache search python-keyczar )" ] && apt_install python-keyczar
+    [ -n "$(dpkg_check_lock && apt-cache search python-keyczar)" ] && apt_install python-keyczar
     dpkg_check_lock && apt-cache search ^git$ | grep -q "^git\s" && apt_install git || apt_install git-core
 
     # If python-pip install failed and setuptools exists, try that
@@ -93,7 +92,7 @@ if [ ! "$(which ansible-playbook)" ]; then
       easy_install pip
     fi
     # If python-keyczar apt package does not exist, use pip
-    [ -z "$( apt-cache search python-keyczar )" ] && sudo pip install python-keyczar
+    [ -z "$(apt-cache search python-keyczar)" ] && sudo pip install python-keyczar
 
     # Install passlib for encrypt
     apt_install build-essential
@@ -138,7 +137,7 @@ if [ ! "$(which ansible-playbook)" ]; then
 
   pip install -q six --upgrade
   mkdir -p /etc/ansible/
-  printf "%s\n" "[local]" "localhost" > /etc/ansible/hosts
+  printf "%s\n" "[local]" "localhost" >/etc/ansible/hosts
   set -x
   if [ -z "$ANSIBLE_VERSION" -a -n "$(which pip3)" ]; then
     pip3 install -q ansible
@@ -155,7 +154,7 @@ if [ ! "$(which ansible-playbook)" ]; then
   if [ -f /etc/centos-release ] || [ -f /etc/redhat-release ] || [ -f /etc/oracle-release ] || [ -f /etc/system-release ]; then
     # Fix for pycrypto pip / yum issue
     # https://github.com/ansible/ansible/issues/276
-    if  ansible --version 2>&1  | grep -q "AttributeError: 'module' object has no attribute 'HAVE_DECL_MPZ_POWM_SEC'" ; then
+    if ansible --version 2>&1 | grep -q "AttributeError: 'module' object has no attribute 'HAVE_DECL_MPZ_POWM_SEC'"; then
       echo 'WARN: Re-installing python-crypto package to workaround ansible/ansible#276'
       echo 'WARN: https://github.com/ansible/ansible/issues/276'
       pip uninstall -y pycrypto
